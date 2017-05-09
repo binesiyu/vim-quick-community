@@ -42,9 +42,9 @@ fu! s:TabCompleteWay()
 endfunction
 
 " Omni autocomplete
-setlocal omnifunc=CocosComplete
+" setlocal omnifunc=CocosComplete
 " map <Tab> to <C-x><C-o>, depend on the char defore the cursor
-inoremap <silent> <buffer> <Tab> <C-r>=<SID>TabCompleteWay()<CR>
+" inoremap <silent> <buffer> <Tab> <C-r>=<SID>TabCompleteWay()<CR>
 
 
 " ======== binding key to run Quick Player for the project of this Lua file.====
@@ -93,14 +93,14 @@ def pyrun():
 		rootFilePath = os.environ.get('QUICK_V3_ROOT')
 		playerPath = os.path.join(rootFilePath, "quick/player/win32/player3.exe")
 	elif(sysstr == "Darwin"):
-		rootFilePath =  os.path.join(os.path.expanduser('~'), ".QUICK_V3_ROOT")
+		rootFilePath =  "/Applications"#os.path.join(os.path.expanduser('~'), ".QUICK_V3_ROOT")
 		if False == os.path.exists(rootFilePath):
 			print("Error:file " + rootFilePath + " Not Found!")
 			return
 		fp = codecs.open(rootFilePath,"r","utf-8")
 		quickRoot = fp.readline().strip('\n')
 		fp.close()
-		playerPath = os.path.join(quickRoot, "quick/player/player3.app/Contents/MacOS/player3")
+		playerPath = os.path.join(quickRoot, "player3.app/Contents/MacOS/player3")
 	else:
 		print("Error:Wrong host system!")
 		return
