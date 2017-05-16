@@ -1,51 +1,3 @@
-" ========== code autocomplete =============
-let s:myfile = readfile(fnamemodify(g:cocos2dx_diction_location, ":p"))
-let s:filelen = len(s:myfile)
-
-fu! CocosComplete(findstart, base)
-	if a:findstart
-		" locate the start of the word
-		let line = getline('.')
-		let start = col('.') - 1
-		while start > 0 && (line[start - 1] =~ '\w' || line[start - 1] == '.')
-			let start -= 1
-		endwhile
-		return start
-	else
-		let i = match(s:myfile, '^'.a:base)
-		let endflag = 0
-		let findlist = []
-		while i < s:filelen
-			if s:myfile[i] =~ '^'.a:base
-				call add(findlist, s:myfile[i])
-				let endflag = 1
-			endif
-			if endflag == 1 && s:myfile[i] !~ '^'.a:base
-				break
-			endif
-			let i += 1
-		endwhile
-
-		return findlist
-	endif
-endfunction
-
-fu! s:TabCompleteWay()
-	" Check if the char before the cursor is an 
-	" underscore, letter, number, dot or opening parentheses.
-	" If it is, popup autocomplete menu
-	if searchpos('[_a-zA-Z0-9.(]\%#', 'nb') != [0, 0] 
-		return "\<C-X>\<C-O>"
-	else
-		return "\<Tab>"
-	endif
-endfunction
-
-" Omni autocomplete
-" setlocal omnifunc=CocosComplete
-" map <Tab> to <C-x><C-o>, depend on the char defore the cursor
-" inoremap <silent> <buffer> <Tab> <C-r>=<SID>TabCompleteWay()<CR>
-
 
 " ======== binding key to run Quick Player for the project of this Lua file.====
 " Check if Vim support Python
@@ -57,9 +9,21 @@ endif
 
 python << EOF
 playerProcess = None
+closeProcess = False
 EOF
 
-fu! RunPlayer()
+fu! RunPlayer(close)
+python << EOF
+closeProcess = True
+EOF
+
+if a:close == "false"
+python << EOF
+closeProcess = False
+EOF
+    
+endif
+
 " start python code
 python << EOF
 import vim
@@ -93,14 +57,8 @@ def pyrun():
 		rootFilePath = os.environ.get('QUICK_V3_ROOT')
 		playerPath = os.path.join(rootFilePath, "quick/player/win32/player3.exe")
 	elif(sysstr == "Darwin"):
-		rootFilePath =  "/Applications"#os.path.join(os.path.expanduser('~'), ".QUICK_V3_ROOT")
-		if False == os.path.exists(rootFilePath):
-			print("Error:file " + rootFilePath + " Not Found!")
-			return
-		fp = codecs.open(rootFilePath,"r","utf-8")
-		quickRoot = fp.readline().strip('\n')
-		fp.close()
-		playerPath = os.path.join(quickRoot, "player3.app/Contents/MacOS/player3")
+		rootFilePath =  "/Applications/"#os.path.join(os.path.expanduser('~'), ".QUICK_V3_ROOT")
+		playerPath = os.path.join(rootFilePath, "player3.app/Contents/MacOS/player3")
 	else:
 		print("Error:Wrong host system!")
 		return
@@ -145,18 +103,20 @@ def pyrun():
 		args.append("-size")
 		args.append(width + "x" + height)
 	
-	# kill running Player3
-	procs = psutil.Process().children()
-	for p in procs:
-		if p.name() == "player3":
-			p.terminate()
-			p.wait()
+		if closeProcess:
+		# kill running Player3
+			procs = psutil.Process().children()
+			for p in procs:
+				if p.name() == "player3" or p.name() == "Terminal":
+					p.terminate()
+					p.wait()
 
-	# run a new player
-	subprocess.Popen(args)
+		# run a new player
+		subprocess.Popen(args)
 
 pyrun()
 EOF
 endfunction
 
-map <F5> :call RunPlayer()<CR>
+map <F5> :call RunPlayer("true")<CR>
+map <F6> :call RunPlayer("false")<CR>
