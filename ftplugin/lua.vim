@@ -1,31 +1,31 @@
 
 " ======== binding key to run Quick Player for the project of this Lua file.====
 " Check if Vim support Python
-if !has('python')
-    echo "Error: Run Player Required vim compiled with +python"
+if !has('python3')
+    echo "Error: Run Player Required vim compiled with +python3"
    	echo "Vim for Windows,please check Python & Vim both are 32bit version!"
     finish
 endif
 
-python << EOF
+python3 << EOF
 playerProcess = None
 closeProcess = False
 EOF
 
 fu! RunPlayer(close)
-python << EOF
+python3 << EOF
 closeProcess = True
 EOF
 
 if a:close == "false"
-python << EOF
+python3 << EOF
 closeProcess = False
 EOF
     
 endif
 
-" start python code
-python << EOF
+" start python3 code
+python3 << EOF
 import vim
 import os
 import codecs
