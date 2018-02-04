@@ -12,7 +12,7 @@ playerProcess = None
 closeProcess = False
 EOF
 
-fu! RunPlayer(close)
+fu! quickplayer#RunPlayer(close)
 python3 << EOF
 closeProcess = True
 EOF
@@ -117,6 +117,3 @@ def pyrun():
 pyrun()
 EOF
 endfunction
-
-map <F5> :call RunPlayer("true")<CR>
-map <F6> :call RunPlayer("false")<CR>
