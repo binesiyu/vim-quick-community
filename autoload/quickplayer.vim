@@ -7,11 +7,6 @@ if !has('python3')
     finish
 endif
 
-python3 << EOF
-playerProcess = None
-closeProcess = False
-EOF
-
 fu! quickplayer#RunPlayer(close)
 python3 << EOF
 closeProcess = True
@@ -21,8 +16,13 @@ if a:close == "false"
 python3 << EOF
 closeProcess = False
 EOF
-    
+
 endif
+
+python3 << EOF
+pyrun()
+EOF
+endfunction
 
 " start python3 code
 python3 << EOF
@@ -34,6 +34,8 @@ import subprocess
 import platform
 import time
 import psutil
+playerProcess = None
+closeProcess = False
 
 def pyrun():
 	# get project "src" dir
@@ -102,7 +104,7 @@ def pyrun():
 		f.close()
 		args.append("-size")
 		args.append(width + "x" + height)
-	
+
 		if closeProcess:
 		# kill running Player3
 			procs = psutil.Process().children()
@@ -112,8 +114,5 @@ def pyrun():
 					p.wait()
 
 		# run a new player
-		subprocess.Popen(args)
-
-pyrun()
+		subprocess.Popen(args,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
 EOF
-endfunction
